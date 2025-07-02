@@ -336,17 +336,14 @@ def main():
     print("start")
 
     # Set up an argument parser for command-line arguments
-    # Set up an argument parser for command-line arguments
     parser = argparse.ArgumentParser()
 
-    # Add arguments for epochs, batch sizes, and learning rate
     # Add arguments for epochs, batch sizes, and learning rate
     parser.add_argument("--epochs",type=int,default=10)
     parser.add_argument("--train_batch_size",type=int,default=4)
     parser.add_argument("--valid_batch_size",type=int,default=2)
     parser.add_argument("--learning_rate",type=float,default=5e-5)
 
-    # Parse the command-line arguments
     # Parse the command-line arguments
     args = parser.parse_args()
 
@@ -356,72 +353,56 @@ def main():
 
 
     # Set the device to CUDA if available, otherwise CPU
-    # Set the device to CUDA if available, otherwise CPU
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # Initialize the tokenizer
     # Initialize the tokenizer
     tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
 
     # Initialize the model
-    # Initialize the model
     model = DistilBERTClass()
 
-    # Move the model to the selected device
     # Move the model to the selected device
     model.to(device)
 
     # Define the learning rate and optimizer
-    # Define the learning rate and optimizer
     LEARNING_RATE = 1e-05
     optimizer = torch.optim.Adam(params = model.parameters(), lr=LEARNING_RATE)
 
-    # Define the loss function
     # Define the loss function
     loss_function = torch.nn.CrossEntropyLoss()
 
     # Train loop
 
     # Set the number of training epochs
-    # Set the number of training epochs
     EPOCHS = 2
 
-    # Start the training loop
     # Start the training loop
     for epoch in range(EPOCHS):
         print(f"starting epoch: {epoch}")
 
         # Train the model for one epoch
-        # Train the model for one epoch
         train(epoch, model, device, training_loader, optimizer, loss_function)
 
-        # Validate the model
         # Validate the model
         valid(epoch, model, testing_loader, device, loss_function)
 
 
     # Get the SageMaker model directory from environment variables
-    # Get the SageMaker model directory from environment variables
     output_dir = os.environ['SM_MODEL_DIR']
 
-    # Define the output path for the model file
     # Define the output path for the model file
     output_model_file = os.path.join(output_dir, 'pytorch_distilbert_news.bin')
 
     # Define the output path for the vocabulary file
-    # Define the output path for the vocabulary file
     output_vocab_file = os.path.join(output_dir, 'vocab_distilbert_news.bin')
 
-    # Save the model's state dictionary
     # Save the model's state dictionary
     torch.save(model.state_dict(),output_model_file)
 
     # Save the tokenizer's vocabulary
-    # Save the tokenizer's vocabulary
     tokenizer.save_vocabulary(output_vocab_file)
 
 
-# Run the main function if the script is executed directly
 # Run the main function if the script is executed directly
 if __name__ == '__main__':
     main()
